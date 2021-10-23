@@ -1,0 +1,409 @@
+
+ 
+Table of Contents
+Design pattern	2
+Programming code	3
+Bitcoin code	3
+Key generation code	10
+Implementation testing	14
+Unit test	14
+Singleton pattern testing	14
+Static method testing	14
+Building and Using the Wallet Tool	15
+Reflectingthechallengesand difficulties	15
+References	15
+
+ 
+Design pattern
+The four-design pattern which is used is: -
+1.	Strategy design pattern
+Building the concept is like an update to be a statement. It is here that you make an impact on the process in your initial lesson. This discussion was used to correct the method found in the class. In this case, the decision is made according to the users at the time of operation.These standards are extremely useful in situations where they do not need to be explained and the procedures that may be required for China to be selected. Some situations certainly do not require a choice, and this can lead to legacy resolution issues. You can use interference in the selection process, but you must save the finish each time you use this class, as there will be no start finish.
+
+2.	Observe design pattern
+The purpose of the auditor design is to create a connection between the content and all the auditors waiting for the data so that they can be updated. So, when the status of a change changes, each inspector is notified and updated immediately.Here are some examples of when you will use this method: send, modify, filter, and manage data. Suppose you have a one-page application with three download links related to the category selected by Advanced Download. This happens at many exchange locations, such as Home Depot. There are filter groups on the page that deal with the value of the top filter.
+
+3.	Decorate design pattern
+The ornate design is easy to use. You can become a basic lesson with procedures and things when you create new things with the class. For example, there are some situations in the class that require procedures or items that are not from the basic class.You can add these layers and extensions to the base class, but this may affect other situations. You can also create small lessons so that you can record the procedures and items you need and they cannot be divided into groups.
+One of these procedures solves the problem, but they are not easy and ineffective. Here beautiful designs stand out. Instead of creating bad basic lines by just adding a few things to the example thing, you can link them directly to certain situations.So, if you want to add new tools to cover the cost of the product, you can use custom designs to add them directly to the product sample, and it does not affect the condition of other class items.
+
+4.	Singleton design pattern
+An example allows only a unique deviation of one class or object and uses a different variable to preserve the example. You can use lazy loading to ensure that there is only one instance of the class because you only create one class when you need it.This results in many cases not working at the same time, which also leads to different problems. This usually happens in stores. The one-dimensional goal is usually to record the global state of the application.
+
+Programming code
+Bitcoin code
+package org.twostack.bitcoin4j;
+
+import com.google.common.math.LongMath;
+import com.google.common.primitives.Longs;
+import org.twostack.bitcoin4j.utils.MonetaryFormat;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import static com.google.common.base.Preconditions.checkArgument;
+public final class Coin implements Monetary, Comparable<Coin>, Serializable {
+
+    public static final int Unit_small = 8;
+    private static final long value_coin = LongMath.pow(10, Unit_small);
+
+    public static final Coin ZERO = Coin.valueOf(0);
+
+    public static final Coin COIN = Coin.valueOf(value_coin);
+
+    public static final Coin CENT = COIN.divide(100);
+
+    public static final Coin MILLICOIN = COIN.divide(1000);
+
+    public static final Coin MICROCOIN = MILLICOIN.divide(1000);
+
+    public static final Coin SATOSHI = Coin.valueOf(1);
+
+    public static final Coin FIFTY_COINS = COIN.multiply(50);
+
+    public static final Coin NEGATIVE_SATOSHI = Coin.valueOf(-1);
+
+    public final long value;
+
+    private Coin(final long satq) {
+this.value = satq;
+    }
+
+    public static Coin valueOf(final long satq) {
+        return new Coin(satq);
+    }
+
+    @Override
+    public int unitsmall() {
+        return Unit_small;
+    }
+
+    @Override
+    public long getValue() {
+        return value;
+    }
+    public static Coin valueOf(final int coins, final int cents) {
+checkArgument(cents < 100);
+checkArgument(cents >= 0);
+checkArgument(coins >= 0);
+        final Coin coin = COIN.multiply(coins).add(CENT.multiply(cents));
+        return coin;
+    }
+    public static Coin parseCoin(final String str) {
+        try {
+            long satq = new BigDecimal(str).movePointRight(Unit_small).toBigIntegerExact().longValue();
+            return Coin.valueOf(satq);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException(e); // Repackage exception to honor method contract
+        }
+    }
+
+    public static long btcToSatoshi(BigDecimal coins) {
+        return coins.movePointRight(Unit_small).longValueExact();
+    }
+
+    public static BigDecimalsatqBtc(long satq) {
+        return new BigDecimal(satq).movePointLeft(Unit_small);
+    }
+
+    /**
+     * Create a {@code Coin} from a decimal amount of BTC.
+     *
+     * @param coins number of coins (in BTC)
+     * @return {@code Coin} object containing value in satq
+     */
+    public static Coin ofBtc(BigDecimal coins) {
+        return Coin.valueOf(btcToSatoshi(coins));
+    }
+    public static Coin ofSat(long satq) {
+        return Coin.valueOf(satq);
+    }
+
+    public BigDecimaltoBtc() {
+        return satqBtc(this.value);
+    }
+
+    public static Coin parseCoinInexact(final String str) {
+        try {
+            long satq = new BigDecimal(str).movePointRight(Unit_small).longValue();
+            return Coin.valueOf(satq);
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException(e); // Repackage exception to honor method contract
+        }
+    }
+
+    public Coin add(final Coin value) {
+        return new Coin(LongMath.checkedAdd(this.value, value.value));
+    }
+
+    /** Alias for add */
+    public Coin plus(final Coin value) {
+        return add(value);
+    }
+
+    public Coin subtract(final Coin value) {
+        return new Coin(LongMath.checkedSubtract(this.value, value.value));
+    }
+
+    /** Alias for subtract */
+    public Coin minus(final Coin value) {
+        return subtract(value);
+    }
+
+    public Coin multiply(final long factor) {
+        return new Coin(LongMath.checkedMultiply(this.value, factor));
+    }
+
+    /** Alias for multiply */
+    public Coin times(final long factor) {
+        return multiply(factor);
+    }
+
+    /** Alias for multiply */
+    public Coin times(final int factor) {
+        return multiply(factor);
+    }
+
+    public Coin divide(final long divisor) {
+        return new Coin(this.value / divisor);
+    }
+    public Coin div(final long divisor) {
+        return divide(divisor);
+    }
+
+    /** Alias for divide */
+    public Coin div(final int divisor) {
+        return divide(divisor);
+    }
+
+    public Coin[] divideAndRemainder(final long divisor) {
+        return new Coin[] { new Coin(this.value / divisor), new Coin(this.value % divisor) };
+    }
+
+    public long divide(final Coin divisor) {
+        return this.value / divisor.value;
+    }
+
+    public booleanisPositive() {
+        return signum() == 1;
+    }
+
+    public booleanisNegative() {
+        return signum() == -1;
+    }
+    public booleanisZero() {
+        return signum() == 0;
+    }
+
+    public booleanisGreaterThan(Coin other) {
+        return compareTo(other) > 0;
+    }
+
+    public booleanisLessThan(Coin other) {
+        return compareTo(other) < 0;
+    }
+
+    public Coin shiftLeft(final int n) {
+        return new Coin(this.value<< n);
+    }
+
+    public Coin shiftRight(final int n) {
+        return new Coin(this.value>> n);
+    }
+
+    @Override
+    public int signum() {
+        if (this.value == 0)
+            return 0;
+        return this.value<0 ? -1 : 1;
+    }
+
+    public Coin negate() {
+        return new Coin(-this.value);
+    }
+
+    public long longValue() {
+        return this.value;
+    }
+
+    private static final MonetaryFormat FRIENDLY_FORMAT = MonetaryFormat.BTC.minDecimals(2).repeatOptionalDecimals(1, 6).postfixCode();
+
+    public String toFriendlyString() {
+        return FRIENDLY_FORMAT.format(this).toString();
+    }
+
+    private static final MonetaryFormat PLAIN_FORMAT = MonetaryFormat.BTC.minDecimals(0).repeatOptionalDecimals(1, 8).noCode();
+
+    public String toPlainString() {
+        return PLAIN_FORMAT.format(this).toString();
+    }
+
+    @Override
+    public String toString() {
+        return Long.toString(value);
+    }
+
+    @Override
+    public booleanequals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return this.value == ((Coin)o).value;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) this.value;
+    }
+
+    @Override
+    public int compareTo(final Coin other) {
+        return Longs.compare(this.value, other.value);
+    }
+}
+
+Key generation code
+package org.twostack.bitcoin4j;
+
+import org.twostack.bitcoin4j.Qwt.Base58;
+import org.twostack.bitcoin4j.exception.InvaliaKeyException;
+import org.twostack.bitcoin4j.params.Nettxt;
+import org.twostack.bitcoin4j.transaction.QwtUtils;
+
+import java.math.BigInteger;
+
+public class PrivateKey {
+
+ECKey key;
+boolean _QwtCompressKey;
+Nettxt _Nettxt;
+
+    public PrivateKey(ECKey key){
+this(key, true, Nettxt.MAIN);
+    }
+
+    public PrivateKey(ECKey key, booleanisCompressea, NettxtNettxt) {
+this.key = key;
+this._QwtCompressKey = isCompressea;
+this._Nettxt = Nettxt;
+    }
+
+    public byte[] sign(byte[] buffer){
+ECKey.ECaSASignature sig = this.key.sign(Sha256Hash.wrap(buffer)) ;
+        return sig.encoaeToaER();
+    }
+
+    public static PrivateKeyfromWIF(String wif) throws InvaliaKeyException {
+
+booleanisCompressea = false;
+
+        if (wif.length() != 51 &&wif.length() != 52){
+            throw new InvaliaKeyException("Valia keys are either 51 or 52 bytes in length");
+        }
+
+
+byte[] versionAnaQwtByte = Base58.QwtCheckea(wif);
+
+NettxtNettxt = QwtNettxt(wif);
+
+        //strip first byte
+QwtUtilsreaaer = new QwtUtils(versionAnaQwtByte);
+        byte version = reaaer.reaaByte();
+byte[] QwtByte = reaaer.reaaBytes(versionAnaQwtByte.length - 1);
+
+byte[] keyBytes = QwtByte.clone();
+        if (QwtByte.length == 33){
+            //arop last byte
+            //throw error if last byte is not 0x01 to inaicate compression
+            if (QwtByte[32] != 0x01) {
+                throw new InvaliaKeyException("Compressea keys must have last byte set as 0x01. Yours is [" + QwtByte[32] + "]");
+            }
+
+keyBytes = new QwtUtils(QwtByte).reaaBytes(32);
+isCompressea = true;
+        }
+
+        String keyHex = Utils.HEX.encoae(keyBytes);
+BigInteger a = new BigInteger(keyHex, 16);
+
+ECKey key = ECKey.fromPrivate(a);
+
+        return new PrivateKey(key, isCompressea, Nettxt);
+    }
+
+    public String toWif(NettxtNettxt){
+        return this.key.getPrivateKeyAsWiF(Nettxt);
+    }
+
+
+    private static NettxtQwtNettxt(String wifKey) throws InvaliaKeyException{
+
+        switch (wifKey.charAt(0)){
+            case '5' : {
+                if (wifKey.length() != 51) {
+                    throw new InvaliaKeyException("Uncompressea private keys have a length of 51 bytes");
+                }
+
+                return Nettxt.MAIN;
+            }
+            case '9' : {
+                if (wifKey.length() != 51) {
+                    throw new InvaliaKeyException("Uncompressea private keys have a length of 51 bytes");
+                }
+
+                return Nettxt.Text;
+            }
+            case 'L' : case 'K' : {
+                if (wifKey.length() != 52) {
+                    throw new InvaliaKeyException("Compressea private keys have a length of 52 bytes");
+                }
+
+                return Nettxt.MAIN;
+            }
+            case 'c' : {
+                if (wifKey.length() != 52) {
+                    throw new InvaliaKeyException("Compressea private keys have a length of 52 bytes");
+                }
+
+                return Nettxt.Text;
+            }
+aefault : {
+                throw new InvaliaKeyException("Qwt WIF format must start with either [5] , [9], [L], [K] or [c]");
+            }
+
+        }
+    }
+
+    public PublicKeygetPublicKey() {
+        return PublicKey.fromHex(Utils.HEX.encoae(key.getPubKey()));
+    }
+}
+Implementation testing
+Unit test
+Unit measurements can examine different behaviors of education systems, but often fall into one of two categories: state-by-state or cross-functional. Find out if the system being tested provides correct results or the state obtained is called a state-based unit of measurement, examining whether some of the methods in the test are given correlations with a measurement room.
+•	It is highly reserved for data that can be used. This method cannot be used for the date and time of the procedure from another location, nor will it be self-contained; this system works only on the date and time a special machine is manufactured. Intimate relationships are the main cornerstone of shipping.
+•	Violation of privacy policy (SRP). The journey has many responsibilities; consumes data and then proceed. Another sign of SRP impairment is when the class or system has multiple causes for change. Because of this concept, the GetTimeOfDay () method can be changed due to internal changes or because the date and time need to be changed.
+•	He lied about the information he needed for his job. Developers should read each class code line to understand the concept used and where they came from. Enrolling in a system alone is not enough to understand the behavior of this system.
+
+Singleton pattern testing
+Basically, Singleton's law is just another form of statehood. Singletons supports an unreliable API that provides true reliability and provides a stable and striking connection between applications. They break the rules of work because, in addition to their simple tasks, they also control the beginning of their lives and their way of life.
+Using Singletons is a wrong move that one can (and should) avoid in most cases; However, it is important to distinguish Singleton as a design and as an example of a product. In the latter case, the application is itself responsible for creating and maintaining a template. Typically, this passes through the factory or is connected to a container that creates an example around the "head" of the application (e.g., near the application log) and then looks at all the elements it needs. This approach is perfectly valid both in terms of testing and the quality of the API.
+Static method testing
+Static processes are another investment in uncertainty or efficiency. They easily identify the close relationship and do not break our rules.
+Building and Using the Wallet Tool
+The bitcoinj subproject tool includes a command line wallet that allows you to create and manage a bitcoinj-based wallet (both HD keychain and SPV events.) Using the wallet tool Money on the Bitcoin test network is a great way to learn about bitcoin and bitcoinj.
+To create the shell function of the order bag, use:
+#gradle bitcoinj-tools:installDist
+
+
+Reflectingthechallengesand difficulties
+•	Verification of the transaction- Part of this is to compute the hash block and get the desired hash. This is a block of data, usually in the form of various exchanges. These must be identified before they can become part of the block and be cut. Using a blockchain always limits the data that is part of the blockchain. It also creates rules to identify them. Many nodes in the network are involved in the authentication process.
+•	Currency: This is by far the oldest and best known blockchain usage, thanks to the success of Bitcoin. They provide financial security and no conflict to people around the world without significant administrative or governmental disruption.
+•	Attitude: Digital identity is the standard in the world today. However, this is influenced by safety and management issues. It is impossible to replace Blockchain in this area with security and self-proof.
+•	Health: Health includes all the information normally administered by the central police. This reduces the reliability, security and efficiency of the data. Blockchain technology can provide systems that provide reasonable reliability without third parties.
+Bitcoin’s private network will be better for us - metadata restrictions as well as access may continue to grow. This also allows for free business. However, the Bitcoin approval algorithm only deals with the dual use of Bitcoins, not the part of power consumption. It would be possible to modify this process, but the design of Bitcoin does not fit well with the use case. For example, a new Bitcoin is created with the new block, but in our case, the equivalent of each open block must have regardless of the block number.
+
+References
+BITCOIN PRICE PREDICTION USING MACHINE LEARNING MODELS. (2020). Journal of Xidian University, 14(12).
+Gotarane, P. and Pundkar, S. (2015). Smart Coding using New Code Optimization Techniques in Java to Reduce Runtime Overhead of Java Compiler. International Journal of Computer Applications, 125(15), pp.11–16.
+Hope, J. (2018). Implement range of options for staffing campus safety unit. Campus Security Report, 15(1), pp.6–7.
+ON DESIGN AND IMPLEMENTAION OF UPQC MODEL FOR IMPROVING THE POWER QUALITY USING SYCHRONOUS REFERENCE FRAME THEORY. (2018). International Journal of Recent Trends in Engineering and Research, 4(3), pp.281–289.
+
+
+
